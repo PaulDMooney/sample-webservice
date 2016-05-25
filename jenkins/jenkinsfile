@@ -1,0 +1,31 @@
+node {
+   // Mark the code checkout 'stage'....
+   stage 'Checkout'
+
+   // Get some code from a GitHub repository
+   git url: 'https://github.com/PaulDMooney/sample-webservice.git'
+
+   // Mark the code build 'stage'....
+   stage 'Show Directory Content'
+   // Run the maven build
+   sh "ls -l"
+   
+   stage 'Build War'
+   gradle 'clean war'
+   
+   stage 'Archive war'
+   step([$class: 'ArtifactArchiver', artifacts: '**/build/*.war', fingerprint: true])
+}
+
+void gradle(String tasks, String switches = null) {
+    String gradleCommand = "";
+    gradleCommand += './gradlew '
+    gradleCommand += tasks
+
+    if(switches != null) {
+        gradleCommand += ' '
+        gradleCommand += switches
+    }
+
+    sh gradleCommand.toString()
+}
